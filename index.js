@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config(); // load .env vars locally
+
 
 const app = express();
 const PORT = 5000;
