@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config(); // load .env vars locally
 
 const app = express();
 const PORT = 5000;
@@ -47,6 +48,12 @@ app.post('/api/waitlist', (req, res) => {
 });
 
 app.get('/dashboard', (req, res) => {
+  const auth = req.query.pass;
+
+  if (auth !== process.env.DASHBOARD_PASS) {
+    return res.status(403).send('<h1>Access Denied</h1>');
+  }
+
   const filePath = path.join(__dirname, 'waitlist.json');
   if (!fs.existsSync(filePath)) return res.send('<h1>No submissions yet</h1>');
 
@@ -84,4 +91,5 @@ app.get('/dashboard', (req, res) => {
     </body></html>
   `);
 });
+
 app.listen(PORT, () => console.log(`Backend running at http://localhost:${PORT}`));
