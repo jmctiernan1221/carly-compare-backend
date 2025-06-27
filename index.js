@@ -48,12 +48,6 @@ app.post('/api/waitlist', (req, res) => {
 });
 
 app.get('/dashboard', (req, res) => {
-  const auth = req.query.pass;
-
-  if (auth !== process.env.DASHBOARD_PASS) {
-    return res.status(403).send('<h1>Access Denied</h1>');
-  }
-
   const filePath = path.join(__dirname, 'waitlist.json');
   if (!fs.existsSync(filePath)) return res.send('<h1>No submissions yet</h1>');
 
