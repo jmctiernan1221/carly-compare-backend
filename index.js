@@ -56,8 +56,7 @@ app.get('/dashboard', (req, res) => {
 
   const rows = entries.map(e => `
     <tr>
-      <td>${e.timestamp}</td><td>${e.name}</td><td>${e.email}</td>
-      <td>${e.zip}</td><td>${e.makeModel}</td><td>${e.mileage || ''}</td>
+      <td>${e.timestamp}</td><td>${e.name}</td><td>${e.email}</td><td>${e.make}</td>
     </tr>
   `).join('');
 
@@ -73,8 +72,7 @@ app.get('/dashboard', (req, res) => {
       <table>
         <thead>
           <tr>
-            <th>Timestamp</th><th>Name</th><th>Email</th>
-            <th>ZIP</th><th>Vehicle</th><th>Mileage</th>
+            <th>Timestamp</th><th>Name</th><th>Email</th><th>Make</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -82,5 +80,4 @@ app.get('/dashboard', (req, res) => {
     </body></html>
   `);
 });
-
 app.listen(PORT, () => console.log(`Backend running at http://localhost:${PORT}`));
