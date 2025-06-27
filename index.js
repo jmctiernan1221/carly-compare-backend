@@ -36,7 +36,11 @@ app.post('/api/waitlist', (req, res) => {
     }
   }
 
-  existing.push({ ...waitlistData, timestamp: new Date().toISOString() });
+  existing.push({
+    ...waitlistData,
+    timestamp: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  });
+
   fs.writeFileSync(filePath, JSON.stringify(existing, null, 2));
 
   res.status(200).json({ message: 'Waitlist submission saved' });
