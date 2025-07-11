@@ -85,5 +85,15 @@ app.get('/dashboard', (req, res) => {
     </body></html>
   `);
 });
+app.delete('/api/waitlist/clear', (req, res) => {
+  const filePath = path.join(__dirname, 'waitlist.json');
 
+  fs.writeFile(filePath, '[]', (err) => {
+    if (err) {
+      console.error('Failed to clear waitlist:', err);
+      return res.status(500).json({ error: 'Failed to clear waitlist' });
+    }
+    res.status(200).json({ message: 'Waitlist cleared successfully' });
+  });
+});
 app.listen(PORT, () => console.log(`Backend running at http://localhost:${PORT}`));
