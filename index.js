@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config(); // Make sure you have a .env file with MONGO_URI
-const WaitlistEntry = require('./models/WaitlistEntry');
+const WaitlistEntry = require('./models/waitlistentry');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
