@@ -41,19 +41,17 @@ Respond with a JSON object.
     });
 
     const result = completion.choices[0].message.content;
-    // Remove markdown formatting like ```json and ```
-const cleanResult = result.replace(/```json|```/g, '').trim();
+    const cleanResult = result.replace(/```json|```/g, '').trim();
 
-let parsed;
-try {
-  parsed = JSON.parse(cleanResult);
-} catch (err) {
-  console.error('❌ Failed to parse OpenAI response:', cleanResult);
-  return res.status(500).json({ error: 'Malformed response from OpenAI.' });
-}
+    let parsed;
+    try {
+      parsed = JSON.parse(cleanResult);
+    } catch (err) {
+      console.error('❌ Failed to parse OpenAI response:', cleanResult);
+      return res.status(500).json({ error: 'Malformed response from OpenAI.' });
+    }
 
-res.json({ quote: parsed });
-    res.json({ quote: result });
+    res.json({ quote: parsed });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to generate quote' });
