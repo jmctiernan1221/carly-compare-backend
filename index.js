@@ -2,18 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config(); // Make sure you have a .env file with MONGO_URI
+
 const WaitlistEntry = require('./models/waitlistentry');
+const quoteAiRoute = require('./routes/quote-ai'); // <-- AI quote route
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/quote-ai', quoteAiRoute); // <-- Register the quote route
 
 // Root route
 app.get('/', (req, res) => res.send('Carly Compare Backend is running!'));
 
-// Mock quotes API
+// Mock quotes API (can be deleted later)
 app.post('/api/getQuotes', (req, res) => {
   console.log('Received car info:', req.body);
   res.json({
