@@ -17,7 +17,9 @@ const quoteAiRoute = require('./routes/quote-ai');
 const subscribeRoute = require('./routes/subscribe');
 
 // Mount routes
+console.log('🧪 Registering /api/quote-ai');
 app.use('/api/quote-ai', quoteAiRoute);
+console.log('🧪 Registering /api/subscribe');
 app.use('/api/subscribe', subscribeRoute);
 
 // Root route
