@@ -13,7 +13,6 @@ router.post('/', async (req, res) => {
       timeZone: 'America/New_York',
     });
 
-    // Check for duplicates
     const existing = await Subscriber.findOne({ email });
     if (existing) {
       return res.status(200).json({ message: 'Already subscribed' });
@@ -29,3 +28,5 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to save subscriber' });
   }
 });
+
+module.exports = router;
