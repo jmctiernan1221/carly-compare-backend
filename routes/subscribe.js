@@ -1,30 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-
-// Temporary file-based storage (or replace with MongoDB if you prefer)
-const SUBSCRIBE_FILE = path.join(__dirname, '../data/subscribers.json');
+const Subscriber = require('../models/subscriber');
 
 router.post('/', async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Valid email is required' });
+  }
 
   try {
-    const data = fs.existsSync(SUBSCRIBE_FILE)
-      ? JSON.parse(fs.readFileSync(SUBSCRIBE_FILE))
-      : [];
+    const timestamp = new Date().toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+    });
 
-    if (!data.includes(email)) {
-      data.push(email);
-      fs.writeFileSync(SUBSCRIBE_FILE, JSON.stringify(data, null, 2));
+    // Check for duplicates
+    const existing = await Subscriber.findOne({ email });
+    if (existing) {
+      return res.status(200).json({ message: 'Already subscribed' });
     }
 
-    res.status(200).json({ message: 'Subscribed successfully' });
+    const newSubscriber = new Subscriber({ email, timestamp });
+    await newSubscriber.save();
+    console.log('✅ New subscriber added:', newSubscriber);
+
+    res.status(200).json({ message: 'Subscription successful' });
   } catch (err) {
-    console.error('Error saving subscription:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('❌ Error saving subscriber:', err);
+    res.status(500).json({ error: 'Failed to save subscriber' });
   }
 });
-
-module.exports = router;
