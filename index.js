@@ -8,6 +8,8 @@ const quoteAiRoute = require('./routes/quote-ai'); // <-- AI quote route
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const subscribeRoute = require('./routes/subscribe');
+app.use('/api/subscribe', subscribeRoute);
 
 app.use(cors());
 app.use(express.json());
