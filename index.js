@@ -1,24 +1,29 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config(); // Make sure you have a .env file with MONGO_URI
-
-const WaitlistEntry = require('./models/waitlistentry');
-const quoteAiRoute = require('./routes/quote-ai'); // <-- AI quote route
+require('dotenv').config(); // Ensure .env has MONGO_URI
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const subscribeRoute = require('./routes/subscribe');
-app.use('/api/subscribe', subscribeRoute);
 
-app.use(cors());
+// Middleware
+app.use(cors({ origin: '*' }));
+app.options('*', cors());
 app.use(express.json());
-app.use('/api/quote-ai', quoteAiRoute); // <-- Register the quote route
+
+// Models & Routes
+const WaitlistEntry = require('./models/waitlistentry');
+const quoteAiRoute = require('./routes/quote-ai');
+const subscribeRoute = require('./routes/subscribe');
+
+// Mount routes
+app.use('/api/quote-ai', quoteAiRoute);
+app.use('/api/subscribe', subscribeRoute);
 
 // Root route
 app.get('/', (req, res) => res.send('Carly Compare Backend is running!'));
 
-// Mock quotes API (can be deleted later)
+// Legacy mock quotes route (can be removed if unused)
 app.post('/api/getQuotes', (req, res) => {
   console.log('Received car info:', req.body);
   res.json({
@@ -46,7 +51,7 @@ app.post('/api/waitlist', async (req, res) => {
   }
 });
 
-// Render waitlist dashboard from MongoDB
+// Waitlist dashboard UI
 app.get('/dashboard', async (req, res) => {
   try {
     const entries = await WaitlistEntry.find().sort({ timestamp: -1 });
@@ -82,7 +87,7 @@ app.get('/dashboard', async (req, res) => {
   }
 });
 
-// Clear waitlist entries in MongoDB
+// Optional: Clear waitlist (DEV use only)
 app.delete('/api/waitlist/clear', async (req, res) => {
   try {
     await WaitlistEntry.deleteMany({});
@@ -93,14 +98,14 @@ app.delete('/api/waitlist/clear', async (req, res) => {
   }
 });
 
-// Connect to MongoDB and start server
+// Start server
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => {
   console.log('✅ Connected to MongoDB Atlas');
-  app.listen(PORT, () => console.log(`Backend running at http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 Backend running at http://localhost:${PORT}`));
 })
 .catch(err => {
   console.error('❌ MongoDB connection error:', err);
