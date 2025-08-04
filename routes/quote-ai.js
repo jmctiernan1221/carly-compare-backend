@@ -39,8 +39,9 @@ Then adjust based on:
    - **CarGurus**: Conservative, 10–15% below KBB.
    - **Local Dealers**: Typically 10–20% below KBB unless car is in high demand.
 
-Return ONLY in the following JSON format:
+Also include a top-level key in your JSON called "base_value_reasoning" — explain in 2–3 sentences how you estimated the starting trade-in value for this vehicle before platform adjustments.
 
+Return ONLY in the following JSON format:
 {
   "estimated_trade_in_values": {
     "Carvana": { "low": 0, "high": 0 },
@@ -85,21 +86,21 @@ Damage: ${vehicle.damage || 'N/A'}
 
     let parsed;
     try {
-      parsed = JSON.parse(cleanResult);
+ parsed = JSON.parse(cleanResult);
 
-      if (
-        !parsed.estimated_trade_in_values ||
-        typeof parsed.estimated_trade_in_values !== 'object' ||
-        !parsed.platform_recommendation ||
-        typeof parsed.platform_recommendation !== 'object'
-      ) {
-        console.error('❌ Missing required keys in response:', parsed);
-        return res.status(500).json({ error: 'Incomplete or unexpected structure from OpenAI.' });
-      }
-    } catch (err) {
-      console.error('❌ Failed to parse OpenAI response:', cleanResult);
-      return res.status(500).json({ error: 'Malformed response from OpenAI.' });
-    }
+// ✅ Add this line right here:
+console.log('🧠 GPT Base Value Reasoning:', parsed.base_value_reasoning);
+
+if (
+  !parsed.estimated_trade_in_values ||
+  typeof parsed.estimated_trade_in_values !== 'object' ||
+  !parsed.platform_recommendation ||
+  typeof parsed.platform_recommendation !== 'object' ||
+  !parsed.base_value_reasoning
+) {
+  console.error('❌ Missing required keys in response:', parsed);
+  return res.status(500).json({ error: 'Incomplete or unexpected structure from OpenAI.' });
+}
 
     res.json({ quote: parsed });
   } catch (err) {
@@ -109,3 +110,4 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
+
