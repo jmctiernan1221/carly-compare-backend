@@ -54,7 +54,7 @@ function cashPrompt(vehicle) {
   return `
 You are a cautious used car pricing analyst. Your job is to generate **realistic instant cash offer ranges** from major platforms (Carvana, CarMax, KBB, CarGurus, Local Dealers) based on the car's **wholesale base value**.
 
-These are **cash offers**, not trade-in values. Cash offers are **15–35% lower** than trade-in values and lower than typical retail or KBB estimates. Be conservative.
+These are **cash offers**, not trade-in values. Cash offers are **28–35% lower** than trade-in values and lower than typical retail or KBB estimates. Be conservative.
 
 ### Process:
 1. Estimate **wholesale base value** using:
@@ -113,6 +113,7 @@ Damage: ${vehicle.damage || 'N/A'}
 }
 
 module.exports = router;
+
 
 
 
