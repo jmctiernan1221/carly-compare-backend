@@ -54,7 +54,7 @@ function cashPrompt(vehicle) {
   return `
 You are a cautious used car pricing analyst. Your job is to generate **realistic instant cash offer ranges** from major platforms based on the car's base wholesale value.
 
-These are **cash offers**, not trade-in values. Emphasize realism — cash offers are **15–35% lower** than trade-in values, and even lower than typical KBB or retail resale estimates.
+These are **cash offers**, not trade-in values. Emphasize realism — cash offers are **25–35% lower** than trade-in values, and even lower than typical KBB or retail resale estimates.
 
 Start by estimating a **wholesale base value**, not private-party or dealer retail. Use:
 
@@ -115,5 +115,6 @@ Damage: ${vehicle.damage || 'N/A'}
 }
 
 module.exports = router;
+
 
 
