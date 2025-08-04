@@ -84,30 +84,28 @@ Damage: ${vehicle.damage || 'N/A'}
     const result = completion.choices[0].message.content;
     const cleanResult = result.replace(/```json|```/g, '').trim();
 
-    let parsed;
-    try {
- parsed = JSON.parse(cleanResult);
+let parsed;
+try {
+  parsed = JSON.parse(cleanResult);
+  console.log('🧠 GPT Base Value Reasoning:', parsed.base_value_reasoning);
 
-// ✅ Add this line right here:
-console.log('🧠 GPT Base Value Reasoning:', parsed.base_value_reasoning);
-
-if (
-  !parsed.estimated_trade_in_values ||
-  typeof parsed.estimated_trade_in_values !== 'object' ||
-  !parsed.platform_recommendation ||
-  typeof parsed.platform_recommendation !== 'object' ||
-  !parsed.base_value_reasoning
-) {
-  console.error('❌ Missing required keys in response:', parsed);
-  return res.status(500).json({ error: 'Incomplete or unexpected structure from OpenAI.' });
-}
-
-    res.json({ quote: parsed });
-  } catch (err) {
-    console.error('❌ OpenAI API Error:', err);
-    res.status(500).json({ error: 'Failed to generate quote' });
+  if (
+    !parsed.estimated_trade_in_values ||
+    typeof parsed.estimated_trade_in_values !== 'object' ||
+    !parsed.platform_recommendation ||
+    typeof parsed.platform_recommendation !== 'object' ||
+    !parsed.base_value_reasoning
+  ) {
+    console.error('❌ Missing required keys in response:', parsed);
+    return res.status(500).json({ error: 'Incomplete or unexpected structure from OpenAI.' });
   }
+
+} catch (err) {
+  console.error('❌ Failed to parse OpenAI response:', cleanResult);
+  return res.status(500).json({ error: 'Malformed response from OpenAI.' });
+}
 });
 
 module.exports = router;
+
 
