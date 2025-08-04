@@ -52,32 +52,30 @@ router.post('/', async (req, res) => {
 
 function cashPrompt(vehicle) {
   return `
-You are a cautious used car pricing analyst. Your job is to generate **realistic instant cash offer ranges** from major platforms based on the car's base wholesale value.
+You are a cautious used car pricing analyst. Your job is to generate **realistic instant cash offer ranges** from major platforms (Carvana, CarMax, KBB, CarGurus, Local Dealers) based on the car's **wholesale base value**.
 
-These are **cash offers**, not trade-in values. Emphasize realism — cash offers are **25–35% lower** than trade-in values, and even lower than typical KBB or retail resale estimates.
+These are **cash offers**, not trade-in values. Cash offers are **15–35% lower** than trade-in values and lower than typical retail or KBB estimates. Be conservative.
 
-Start by estimating a **wholesale base value**, not private-party or dealer retail. Use:
+### Process:
+1. Estimate **wholesale base value** using:
+   - Year, make, model, trim
+   - Mileage (assume 12,000/year is average)
+   - Depreciation from original MSRP:
+     - Year 1: -20%
+     - Year 2: -15%
+     - Each additional year: -12%
+   - Adjust based on:
+     - Interior/exterior condition
+     - Number of owners
+     - Accident history
+     - ZIP code trends (e.g. resale interest in Metro Atlanta — ZIP ${vehicle.zip})
 
-- Year, make, model, trim
-- Mileage (assume 12k/year is average)
-- Depreciation:
-  - Year 1: -20%
-  - Year 2: -15%
-  - Each additional year: -12%
-- Original MSRP (estimate if unknown)
-- Interior & exterior condition
-- Ownership and accident history
-- ZIP ${vehicle.zip} (Metro Atlanta)
-
-⚠️ Note: Users have reported inflated estimates in previous versions. Adjust cautiously downward to reflect realistic **wholesale market** pricing.
-
-Then apply the following cash discount behavior:
-
-1. **Carvana**: 30–40% below base value for older/high-mileage cars.
-2. **CarMax**: 15–25% below base; pays more for clean cars with no accidents.
-3. **KBB Instant Cash Offer**: Use as a benchmark, but reduce by 20–25%.
-4. **CarGurus**: 25–35% below KBB unless low mileage.
-5. **Local Dealers**: 30–40% below KBB unless they need inventory.
+2. From that base, apply platform-specific behavior to simulate cash offers:
+   - **Carvana**: low to moderate range
+   - **CarMax**: slightly higher range, but cautious with damage
+   - **KBB Instant Cash Offer**: uses wide ranges, mid-high depending on data
+   - **CarGurus**: conservative cash buyer behavior
+   - **Local Dealers**: bottom of market, lowest offers
 
 If the same input is repeated, you must return estimates within **±3%** of previous values.
 
@@ -115,6 +113,7 @@ Damage: ${vehicle.damage || 'N/A'}
 }
 
 module.exports = router;
+
 
 
 
