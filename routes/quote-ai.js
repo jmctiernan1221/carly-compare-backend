@@ -7,25 +7,29 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 router.post('/', async (req, res) => {
   const vehicle = req.body;
 
-  const prompt = `
-Respond ONLY with a JSON object in this format:
+const prompt = `
+You are a used car market analyst. Estimate realistic trade-in value ranges for the vehicle below based on current U.S. market conditions. Take into account depreciation, mileage, interior/exterior condition, accident history, number of owners, and ZIP code trends.
+
+Respond ONLY with a JSON object. Do not include markdown or commentary.
+
+Adjust values down for high mileage, poor condition, multiple owners, or accident history. Adjust values slightly upward for excellent condition, low mileage, or high-demand ZIP codes.
+
+Format output exactly like this:
 
 {
   "estimated_trade_in_values": {
-    "Carvana": { "low": 7000, "high": 9000 },
-    "CarMax": { "low": 7200, "high": 9300 },
-    "KBB": { "low": 7100, "high": 9200 },
-    "CarGurus": { "low": 7000, "high": 9100 },
-    "Local Dealers": { "low": 6800, "high": 9000 }
+    "Carvana": { "low": 7200, "high": 8600 },
+    "CarMax": { "low": 7400, "high": 8800 },
+    "KBB": { "low": 7000, "high": 8500 },
+    "CarGurus": { "low": 7200, "high": 8700 },
+    "Local Dealers": { "low": 6900, "high": 8300 }
   },
   "best_season_to_sell": "Spring",
   "platform_recommendation": {
     "best_platform": "CarMax",
-    "explanation": "CarMax often offers competitive trade-in values..."
+    "explanation": "CarMax typically offers the most consistent trade-in values for this type of vehicle in your area."
   }
 }
-
-DO NOT include markdown. No extra text. Just valid JSON.
 
 Vehicle info:
 Year: ${vehicle.year || 'unknown'}
@@ -81,3 +85,4 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
+
