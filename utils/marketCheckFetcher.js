@@ -3,7 +3,7 @@ const axios = require('axios');
 const fetchMarketValue = async ({ make, model, year, trim, mileage, zip }) => {
   const apiKey = process.env.MARKETCHECK_API_KEY;
 
-  const url = `https://marketcheck-prod.apigee.net/v2/search/car/active`;
+  const url = `https://api.marketcheck.com/v2/search/car/active`;
   const params = {
     api_key: apiKey,
     make,
