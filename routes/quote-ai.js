@@ -7,24 +7,22 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 router.post('/', async (req, res) => {
   const vehicle = req.body;
 
-const prompt = `
-You are an expert used car pricing analyst providing realistic U.S. trade-in value estimates for consumer vehicles.
+  const prompt = `
+You are a used car pricing analyst. Estimate realistic trade-in value ranges for the following vehicle, using recent market data, platform-specific behavior, depreciation, and geographic modifiers.
 
-Estimate conservative value ranges across top resale platforms for the vehicle below. Factor in:
-- Age and mileage depreciation (especially over 100,000 miles)
-- Condition (interior/exterior)
-- Number of owners
-- Accident history and damage severity
-- Regional ZIP code resale demand
+Use a JSON format only — no explanations, no commentary.
 
-Avoid overly optimistic values — especially for:
-- Vehicles older than 8 years
-- Vehicles with more than 100,000 miles
-- Multiple owners or accident history
+Base your values on:
 
-If applicable, lower values for poor condition, high mileage, multiple owners, or accident history. Only raise values modestly for strong ZIPs or excellent condition.
+1. Kelley Blue Book (KBB): Adjusts by condition, mileage, location.
+2. CarMax: Typically offers 5–10% more for clean titles in good condition.
+3. Carvana: Offers 20–30% below their retail listings.
+4. CarGurus: Competitive offers but less consistent.
+5. Local Dealers: Moderate offers based on ZIP demand.
 
-Respond **ONLY** with a JSON object. Do not include markdown, commentary, or sample values.
+Apply mileage deductions (avg 12,000 mi/year) and adjust downward for multiple owners, poor condition, or accidents. ZIP 30075 is in Metro Atlanta — competitive but not inflated. Adjust for “Good” (not Excellent) condition.
+
+Respond ONLY with JSON in this format:
 
 Use this format:
 
@@ -97,6 +95,7 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
+
 
 
 
