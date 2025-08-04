@@ -7,26 +7,32 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 router.post('/', async (req, res) => {
   const vehicle = req.body;
 
-const prompt = `
-You are a cautious used car pricing analyst. Your job is to generate realistic **trade-in value ranges** using conservative estimates based on depreciation, condition, platform behaviors, and recent market activity. This is NOT private party value. Be realistic — avoid inflated numbers.
+  const prompt = `
+You are a conservative, market-aware used car valuation analyst. You will generate realistic **trade-in value ranges** based on actual depreciation, platform behavior, and vehicle condition. Use fair but cautious logic. DO NOT provide private-party pricing — this is for **trade-in only**.
 
-Assume:
-- Vehicles with 100K+ miles are depreciated significantly.
-- Average mileage = 12,000 mi/year. Deduct $500–$1,000 per 10K miles above average.
-- “Good” condition is average — not excellent.
-- No accidents and 1–2 owners slightly help value but don’t raise it much.
+Use the following rules:
 
-Trade-in platform logic:
-- **Carvana**: Pays 25–35% below their retail price.
-- **CarMax**: Slightly more generous than average (5–10%) if clean title + decent condition.
-- **KBB**: Base estimate using trade-in tool adjusted for ZIP, mileage, and condition.
-- **CarGurus**: Mid-to-low range estimates unless vehicle is newer or high demand.
-- **Local Dealers**: Usually lowest — estimate 10–20% below KBB on older or high-mileage vehicles.
+1. **Mileage impact**:
+   - Average = 12,000 miles/year.
+   - Deduct $500–$1,000 per 10,000 miles *over* average for the vehicle’s age.
+   - 100K+ miles vehicles face steep depreciation.
 
-Location:
-- ZIP ${vehicle.zip} = Metro Atlanta. Normal demand, no inflation. Adjust accordingly.
+2. **Condition modifiers**:
+   - “Good” = average condition for age. Don’t add any bonus.
+   - 1–2 owners or no accidents help slightly but should not significantly raise value.
+   - Frame or body damage lowers value; cosmetic damage has a minor impact.
 
-Output ONLY JSON in this format (no extra text):
+3. **Platform behaviors**:
+   - **Carvana**: Pays 25–35% below their own retail list prices. Be cautious with high-mileage cars.
+   - **CarMax**: Tends to give higher-than-average offers for clean, no-accident vehicles — about 5–10% above KBB trade-in.
+   - **KBB**: Use this as the core estimate. Reflect ZIP, mileage, and average market value.
+   - **CarGurus**: Conservative. Usually 10–15% below KBB for high-mileage or older vehicles.
+   - **Local Dealers**: Usually lowest — often 10–20% below KBB unless it’s a very high-demand car.
+
+4. **Region**:
+   - ZIP ${vehicle.zip} is Metro Atlanta — normal demand, not inflated. No regional premium.
+
+Return your response ONLY in this JSON format:
 
 {
   "estimated_trade_in_values": {
@@ -39,11 +45,11 @@ Output ONLY JSON in this format (no extra text):
   "best_season_to_sell": "<Winter|Spring|Summer|Fall>",
   "platform_recommendation": {
     "best_platform": "<Carvana|CarMax|KBB|CarGurus|Local Dealers>",
-    "explanation": "Why this platform suits the vehicle’s mileage, condition, ZIP, or platform behavior."
+    "explanation": "Explain why that platform is the best fit for the vehicle’s age, mileage, condition, or location."
   }
 }
 
-Vehicle:
+Vehicle Info:
 Year: ${vehicle.year || 'unknown'}
 Make: ${vehicle.make}
 Model: ${vehicle.model}
@@ -61,10 +67,10 @@ Damage: ${vehicle.damage || 'N/A'}
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
-        { role: 'system', content: 'You are a used car pricing assistant that outputs clean JSON only.' },
+        { role: 'system', content: 'You are a used car pricing analyst. Only return JSON.' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.3,
+      temperature: 0.2,
     });
 
     const result = completion.choices[0].message.content;
@@ -74,7 +80,6 @@ Damage: ${vehicle.damage || 'N/A'}
     try {
       parsed = JSON.parse(cleanResult);
 
-      // ✅ Basic shape check
       if (
         !parsed.estimated_trade_in_values ||
         typeof parsed.estimated_trade_in_values !== 'object' ||
@@ -97,8 +102,3 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
-
-
-
-
-
