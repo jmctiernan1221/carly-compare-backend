@@ -1,51 +1,45 @@
 const express = require('express');
 const router = express.Router();
 const { OpenAI } = require('openai');
-const fetchMarketValue = require('../utils/marketCheckFetcher'); // <-- Import MarketCheck fetcher
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 router.post('/', async (req, res) => {
   const vehicle = req.body;
 
-  let baseValue;
-  try {
-    const market = await fetchMarketValue(vehicle);
-    baseValue = market.averagePrice;
-    console.log('✅ MarketCheck base value:', baseValue);
-  } catch (err) {
-    console.warn('⚠️ MarketCheck failed, defaulting to $12000');
-    baseValue = 12000; // Fallback default
-  }
-
   const prompt = `
-You are a conservative, market-aware used car valuation analyst. You will generate realistic **trade-in value ranges** based on actual depreciation, platform behavior, and vehicle condition. Use fair but cautious logic. DO NOT provide private-party pricing — this is for **trade-in only**.
+You are a conservative, market-aware used car valuation analyst. You will generate realistic **trade-in value ranges** based on your internal estimate of base value, average depreciation, platform behavior, and vehicle condition. DO NOT provide private-party pricing — this is for **trade-in only**.
 
-Use the following rules:
+Start your logic by estimating a **realistic trade-in base value** based on the vehicle's:
+- Make, model, trim, year
+- Mileage (assume 12,000 miles/year is average)
+- Typical depreciation curve:
+  - Year 1: -15% to -20%
+  - Year 2: -10% to -15%
+  - Each additional year: -10% to -12%
+- Luxury/exotic vehicles tend to depreciate faster.
+- ZIP ${vehicle.zip} is in Metro Atlanta — average demand, no regional premiums.
+
+Then adjust based on:
 
 1. **Mileage impact**:
-   - Average = 12,000 miles/year.
-   - Deduct $500–$1,000 per 10,000 miles *over* average for the vehicle’s age.
-   - 100K+ miles vehicles face steep depreciation.
+   - Deduct $500–$1,000 per 10,000 miles *over* average for vehicle’s age.
+   - Vehicles over 100K miles should have heavy depreciation.
 
 2. **Condition modifiers**:
-   - “Good” = average condition for age. Don’t add any bonus.
-   - 1–2 owners or no accidents help slightly but should not significantly raise value.
-   - Frame or body damage lowers value; cosmetic damage has a minor impact.
+   - “Excellent” = slightly better than average for its age.
+   - “Good” = average. Don’t adjust.
+   - 1–2 owners or no accidents help slightly.
+   - Body or frame damage = reduce value.
 
-3. **Platform behaviors**:
-   - **Carvana**: Pays 25–35% below their own retail list prices. Be cautious with high-mileage cars.
-   - **CarMax**: Tends to give higher-than-average offers for clean, no-accident vehicles — about 5–10% above KBB trade-in.
-   - **KBB**: Use this as the core estimate. Reflect ZIP, mileage, and average market value.
-   - **CarGurus**: Conservative. Usually 10–15% below KBB for high-mileage or older vehicles.
-   - **Local Dealers**: Usually lowest — often 10–20% below KBB unless it’s a very high-demand car.
+3. **Platform behavior**:
+   - **Carvana**: 25–35% below retail; cautious on high-mileage or older cars.
+   - **CarMax**: Higher-than-average on clean, no-accident cars (+5–10% vs KBB).
+   - **KBB**: Use this as your core average trade-in value.
+   - **CarGurus**: Conservative, 10–15% below KBB.
+   - **Local Dealers**: Typically 10–20% below KBB unless car is in high demand.
 
-4. **Region**:
-   - ZIP ${vehicle.zip} is Metro Atlanta — normal demand, not inflated. No regional premium.
-
-Start your logic with this **baseline market value from real listings**: $${baseValue}
-
-Return your response ONLY in this JSON format:
+Return ONLY in the following JSON format:
 
 {
   "estimated_trade_in_values": {
