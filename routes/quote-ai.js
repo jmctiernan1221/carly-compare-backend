@@ -8,15 +8,25 @@ router.post('/', async (req, res) => {
   const vehicle = req.body;
 
 const prompt = `
-You are a used car market analyst. Estimate realistic trade-in value ranges for the vehicle below based on current U.S. market conditions. Take into account depreciation, mileage, interior/exterior condition, accident history, number of owners, and ZIP code trends.
+You are an expert used car pricing analyst providing realistic U.S. trade-in value estimates for consumer vehicles.
 
-Respond ONLY with a JSON object. Do not include markdown or commentary.
+Estimate conservative value ranges across top resale platforms for the vehicle below. Factor in:
+- Age and mileage depreciation (especially over 100,000 miles)
+- Condition (interior/exterior)
+- Number of owners
+- Accident history and damage severity
+- Regional ZIP code resale demand
 
-Adjust values down for high mileage, poor condition, multiple owners, or accident history. Adjust values upward for excellent condition, low mileage, or ZIPs in high-demand resale markets.
+Avoid overly optimistic values — especially for:
+- Vehicles older than 8 years
+- Vehicles with more than 100,000 miles
+- Multiple owners or accident history
 
-DO NOT copy the format values below — instead, adjust numbers, platform, season, and reasoning based on the provided vehicle data.
+If applicable, lower values for poor condition, high mileage, multiple owners, or accident history. Only raise values modestly for strong ZIPs or excellent condition.
 
-Output format:
+Respond **ONLY** with a JSON object. Do not include markdown, commentary, or sample values.
+
+Use this format:
 
 {
   "estimated_trade_in_values": {
@@ -26,10 +36,10 @@ Output format:
     "CarGurus": { "low": 0, "high": 0 },
     "Local Dealers": { "low": 0, "high": 0 }
   },
-  "best_season_to_sell": "<season>",
+  "best_season_to_sell": "<Winter|Spring|Summer|Fall>",
   "platform_recommendation": {
-    "best_platform": "<platform name>",
-    "explanation": "<reason based on vehicle/location/mileage/condition>"
+    "best_platform": "<Carvana|CarMax|KBB|CarGurus|Local Dealers>",
+    "explanation": "<Why this platform suits the vehicle's age, mileage, condition, or region>"
   }
 }
 
@@ -87,5 +97,6 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
+
 
 
