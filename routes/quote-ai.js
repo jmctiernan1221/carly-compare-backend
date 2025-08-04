@@ -12,22 +12,24 @@ You are a used car market analyst. Estimate realistic trade-in value ranges for 
 
 Respond ONLY with a JSON object. Do not include markdown or commentary.
 
-Adjust values down for high mileage, poor condition, multiple owners, or accident history. Adjust values slightly upward for excellent condition, low mileage, or high-demand ZIP codes.
+Adjust values down for high mileage, poor condition, multiple owners, or accident history. Adjust values upward for excellent condition, low mileage, or ZIPs in high-demand resale markets.
 
-Format output exactly like this:
+DO NOT copy the format values below — instead, adjust numbers, platform, season, and reasoning based on the provided vehicle data.
+
+Output format:
 
 {
   "estimated_trade_in_values": {
-    "Carvana": { "low": 7200, "high": 8600 },
-    "CarMax": { "low": 7400, "high": 8800 },
-    "KBB": { "low": 7000, "high": 8500 },
-    "CarGurus": { "low": 7200, "high": 8700 },
-    "Local Dealers": { "low": 6900, "high": 8300 }
+    "Carvana": { "low": 0, "high": 0 },
+    "CarMax": { "low": 0, "high": 0 },
+    "KBB": { "low": 0, "high": 0 },
+    "CarGurus": { "low": 0, "high": 0 },
+    "Local Dealers": { "low": 0, "high": 0 }
   },
-  "best_season_to_sell": "Spring",
+  "best_season_to_sell": "<season>",
   "platform_recommendation": {
-    "best_platform": "CarMax",
-    "explanation": "CarMax typically offers the most consistent trade-in values for this type of vehicle in your area."
+    "best_platform": "<platform name>",
+    "explanation": "<reason based on vehicle/location/mileage/condition>"
   }
 }
 
@@ -85,4 +87,5 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
+
 
