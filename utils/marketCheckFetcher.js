@@ -15,7 +15,7 @@ const fetchMarketValue = async ({ make, model, year, trim, mileage, zip }) => {
     car_type: 'used',
     miles_range: `${Math.max(0, mileage - 10000)}-${parseInt(mileage) + 10000}`,
     zip,
-    radius: 200,
+    radius: 100,
     rows: 50,
     sort_by: 'price',
   };
