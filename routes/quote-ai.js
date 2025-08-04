@@ -1,11 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const { OpenAI } = require('openai');
+const fetchMarketValue = require('../utils/marketCheckFetcher'); // <-- Import MarketCheck fetcher
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 router.post('/', async (req, res) => {
   const vehicle = req.body;
+
+  let baseValue;
+  try {
+    const market = await fetchMarketValue(vehicle);
+    baseValue = market.averagePrice;
+    console.log('✅ MarketCheck base value:', baseValue);
+  } catch (err) {
+    console.warn('⚠️ MarketCheck failed, defaulting to $12000');
+    baseValue = 12000; // Fallback default
+  }
 
   const prompt = `
 You are a conservative, market-aware used car valuation analyst. You will generate realistic **trade-in value ranges** based on actual depreciation, platform behavior, and vehicle condition. Use fair but cautious logic. DO NOT provide private-party pricing — this is for **trade-in only**.
@@ -31,6 +42,8 @@ Use the following rules:
 
 4. **Region**:
    - ZIP ${vehicle.zip} is Metro Atlanta — normal demand, not inflated. No regional premium.
+
+Start your logic with this **baseline market value from real listings**: $${baseValue}
 
 Return your response ONLY in this JSON format:
 
