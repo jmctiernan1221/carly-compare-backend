@@ -15,10 +15,12 @@ app.use(express.json());
 const WaitlistEntry = require('./models/waitlistentry');
 const quoteAiRoute = require('./routes/quote-ai');
 const subscribeRoute = require('./routes/subscribe');
+const quoteEdmundsRoute = require('./routes/quote-edmonds'); // ✅ NEW
 
 // Mount routes
 app.use('/api/quote-ai', quoteAiRoute);
 app.use('/api/subscribe', subscribeRoute);
+app.use('/api/quote-edmonds', quoteEdmundsRoute); // ✅ NEW
 
 // Root route
 app.get('/', (req, res) => res.send('Carly Compare Backend is running!'));
