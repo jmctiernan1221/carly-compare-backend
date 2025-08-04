@@ -7,24 +7,26 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 router.post('/', async (req, res) => {
   const vehicle = req.body;
 
-  const prompt = `
-You are a used car pricing analyst. Estimate realistic trade-in value ranges for the following vehicle, using recent market data, platform-specific behavior, depreciation, and geographic modifiers.
+const prompt = `
+You are a cautious used car pricing analyst. Your job is to generate realistic **trade-in value ranges** using conservative estimates based on depreciation, condition, platform behaviors, and recent market activity. This is NOT private party value. Be realistic — avoid inflated numbers.
 
-Use a JSON format only — no explanations, no commentary.
+Assume:
+- Vehicles with 100K+ miles are depreciated significantly.
+- Average mileage = 12,000 mi/year. Deduct $500–$1,000 per 10K miles above average.
+- “Good” condition is average — not excellent.
+- No accidents and 1–2 owners slightly help value but don’t raise it much.
 
-Base your values on:
+Trade-in platform logic:
+- **Carvana**: Pays 25–35% below their retail price.
+- **CarMax**: Slightly more generous than average (5–10%) if clean title + decent condition.
+- **KBB**: Base estimate using trade-in tool adjusted for ZIP, mileage, and condition.
+- **CarGurus**: Mid-to-low range estimates unless vehicle is newer or high demand.
+- **Local Dealers**: Usually lowest — estimate 10–20% below KBB on older or high-mileage vehicles.
 
-1. Kelley Blue Book (KBB): Adjusts by condition, mileage, location.
-2. CarMax: Typically offers 5–10% more for clean titles in good condition.
-3. Carvana: Offers 20–30% below their retail listings.
-4. CarGurus: Competitive offers but less consistent.
-5. Local Dealers: Moderate offers based on ZIP demand.
+Location:
+- ZIP ${vehicle.zip} = Metro Atlanta. Normal demand, no inflation. Adjust accordingly.
 
-Apply mileage deductions (avg 12,000 mi/year) and adjust downward for multiple owners, poor condition, or accidents. ZIP 30075 is in Metro Atlanta — competitive but not inflated. Adjust for “Good” (not Excellent) condition.
-
-Respond ONLY with JSON in this format:
-
-Use this format:
+Output ONLY JSON in this format (no extra text):
 
 {
   "estimated_trade_in_values": {
@@ -37,11 +39,11 @@ Use this format:
   "best_season_to_sell": "<Winter|Spring|Summer|Fall>",
   "platform_recommendation": {
     "best_platform": "<Carvana|CarMax|KBB|CarGurus|Local Dealers>",
-    "explanation": "<Why this platform suits the vehicle's age, mileage, condition, or region>"
+    "explanation": "Why this platform suits the vehicle’s mileage, condition, ZIP, or platform behavior."
   }
 }
 
-Vehicle info:
+Vehicle:
 Year: ${vehicle.year || 'unknown'}
 Make: ${vehicle.make}
 Model: ${vehicle.model}
@@ -62,7 +64,7 @@ Damage: ${vehicle.damage || 'N/A'}
         { role: 'system', content: 'You are a used car pricing assistant that outputs clean JSON only.' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.6,
+      temperature: 0.3,
     });
 
     const result = completion.choices[0].message.content;
@@ -95,6 +97,7 @@ Damage: ${vehicle.damage || 'N/A'}
 });
 
 module.exports = router;
+
 
 
 
